@@ -26,10 +26,13 @@ public:
     }
     static void set_level(int l);
     Sudoku(bool no_blanks, bool ans_unique = false);
+    Sudoku(std::string file_name);
     bool generateBoard(int row, int col);
     bool isValid(int row, int col, int num);
     void writeBoardToFile(std::string file_path);
     void Random_leave_blank();
+    bool Solve(int row, int col);
+    bool genSolution() { return Solve(0, 0); }
 };
 
 #endif

@@ -30,6 +30,35 @@ Sudoku::Sudoku(bool no_blanks, bool ans_unique) {
 
 }
 
+Sudoku::Sudoku(std::string file_name)
+{
+    std::ifstream file(file_name);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << file_name << std::endl;
+        return;
+    }
+
+    std::string line;
+    int row = 0;
+    while (std::getline(file, line)) {
+        for (int col = 0; col < COL_NUM; col++) {
+            char c = line[col];
+            if (c == '_') {
+                board[row][col] = 0;
+                masks[row][col] = false;
+            }
+            else {
+                board[row][col] = c - '0';
+                masks[row][col] = true;
+            }
+        }
+        row++;
+        if (row == ROW_NUM) break;
+    }
+
+    file.close();
+}
+
 void Sudoku::set_level(int l) {
     switch (l)
     {
@@ -140,4 +169,32 @@ void Sudoku::Random_leave_blank()
             masks[i][j] = tempArray[i * COL_NUM + j];
         }
     }
+}
+
+bool Sudoku::Solve(int row, int col)
+{
+    if (row == ROW_NUM) {
+        return true;
+    }
+
+    if (col == COL_NUM) {
+        return Solve(row + 1, 0);
+    }
+
+    if (masks[row][col]) {
+        return Solve(row, col + 1);
+    }
+
+    for (int num = 1; num <= 9; num++) {
+        if (isValid(row, col, num)) {
+            board[row][col] = num;
+            if (Solve(row, col + 1)) {
+                return true;
+            }
+            board[row][col] = 0;
+        }
+    }
+
+    return false;
+
 }

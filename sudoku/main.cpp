@@ -9,6 +9,7 @@
 #include "getopt.h"
 #include "Assert.h"
 #include "sudoku.h"
+#include "SudokuSolve.h"
 //需要的数独终盘数量
 bool opt_gen_final = false;
 int final_num = 0;
@@ -110,7 +111,8 @@ int main(int argc, char* argv[])
         }
     }
     if (opt_solve) {
-        //TODO
+
+        solveSudokuFile(solve_path, "sudoku.txt");
     }
     if (opt_number) {
         if (_access("./games", 00) == -1)
