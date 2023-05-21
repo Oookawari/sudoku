@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
 #include "getopt.h"
 #include "Assert.h"
 
@@ -37,7 +39,7 @@ void args_check();
 
 int main(int argc, char* argv[])
 {
-
+    srand(time(nullptr));
     int opt;
     //参数获取
     char getopt_arg[] = "c:s:n:m:r:u";
