@@ -2,6 +2,7 @@
 #ifndef SUDOKU
 #define SUDOKU
 #define UNKNOWN -1
+#include <string>
 const int ROW_NUM = 9;
 const int COL_NUM = 9;
 
@@ -21,6 +22,7 @@ public:
      */
     bool generateBoard(int row, int col);
     bool isValid(int row, int col, int num);
+    void writeBoardToFile(std::string file_path);
 };
 
 #endif

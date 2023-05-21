@@ -2,9 +2,13 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <fstream>
+#include <direct.h>
+#include <io.h>
+
 #include "getopt.h"
 #include "Assert.h"
-
+#include "sudoku.h"
 //需要的数独终盘数量
 bool opt_gen_final = false;
 int final_num = 0;
@@ -86,7 +90,7 @@ int main(int argc, char* argv[])
             opt_unique = true;
             break;
         default:
-            char* mess;
+            char mess[256];
             sprintf(mess, "Invalid Args: %c\n", opt);
             Assert(0, mess);
             break;
@@ -96,7 +100,13 @@ int main(int argc, char* argv[])
     args_check();
 
     if (opt_gen_final) {
-        //TODO
+        if (_access("./final_tables", 00) == -1)
+            _mkdir("./final_tables");
+        std::string file_names = "./final_tables/final_table_";
+        for (int i = 1; i <= final_num; i++) {
+            Sudoku temp = Sudoku(true);
+            temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
+        }
     }
     if (opt_solve) {
         //TODO
@@ -108,11 +118,15 @@ int main(int argc, char* argv[])
 }
 
 void args_check() {
-    if (opt_gen_final)
+    if (opt_gen_final) {
         Assert(final_num > 0, "游戏终局数量需要 > 0 !");
-
-    if (opt_number)
+        Assert(final_num <= 1000000, "游戏终局数量需要 < 1000000 !");
+    }
+    if (opt_number) {
         Assert(number_of_games > 0, "游戏数量需要 > 0");
+        Assert(number_of_games <= 10000, "游戏数量需要 < 10000");
+    }
+        
 
     if (opt_level) {
         Assert(opt_number, "opt-m 需要opt-n");

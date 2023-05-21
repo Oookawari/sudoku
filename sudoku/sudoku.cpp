@@ -1,19 +1,23 @@
 #include "sudoku.h"
 #include <stdlib.h>
 #include <time.h>
-
-Sudoku::Sudoku(bool no_blanks, bool ans_unique = false) {
+#include <fstream>
+#include <iostream>
+Sudoku::Sudoku(bool no_blanks, bool ans_unique) {
     // Initialize board and masks
     for (int i = 0; i < ROW_NUM; i++) {
         for (int j = 0; j < COL_NUM; j++) {
             board[i][j] = 0;
-            masks[i][j] = false;
+            masks[i][j] = true;
         }
     }
 
     generateBoard(0, 0);
     //已经完成了生成，现在你需要挖空或者生成唯一解
     //TODO 
+    if (no_blanks) {
+        
+    }
 }
 
 bool Sudoku::generateBoard(int row, int col) {
@@ -24,10 +28,11 @@ bool Sudoku::generateBoard(int row, int col) {
     int nextRow = (col == COL_NUM - 1) ? row + 1 : row;
     int nextCol = (col + 1) % COL_NUM;
     //增加随机过程
-    int randomization = rand() % 9;
-    for (int num = 1; num <= ROW_NUM; num++) {
-        if (isValid(row, col, num)) {
-            board[row][col] = (num + randomization) % 9;
+    int randomization = rand();
+    for (int num = 0; num <= ROW_NUM; num++) {
+        if (isValid(row, col, (num + randomization) % (ROW_NUM + 1))) {
+            board[row][col] = (num + randomization) % (ROW_NUM + 1);
+            
             if (generateBoard(nextRow, nextCol)) {
                 return true;
             }
@@ -65,4 +70,25 @@ bool Sudoku::isValid(int row, int col, int num) {
     }
 
     return true;
+}
+
+void Sudoku::writeBoardToFile(std::string file_path)
+{
+    std::ofstream file(file_path);
+    if (!file.is_open()) {
+        std::cout << "Error: could not open file : " << file_path << std::endl;
+        return;
+    }
+
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            if (masks[i][j])
+                file << board[i][j] << ' ';
+            else
+                file << '_' << ' ';
+        }
+        file << '\n';
+    }
+
+    file.close();
 }
