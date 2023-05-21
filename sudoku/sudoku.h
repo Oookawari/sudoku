@@ -8,21 +8,28 @@ const int COL_NUM = 9;
 
 class Sudoku {
 private:
-    static int blanks;
+    
+    static int lower_bound_blanks;
+    static int upper_bound_blanks;
     int board[ROW_NUM][COL_NUM];
     bool masks[ROW_NUM][COL_NUM];
 public:
-    void set_blanks(int b) {
-        Sudoku::blanks = b;
+    static enum
+{
+    LEVEL_NONE, LEVEL_EASY, LEVEL_MEDIUM, LEVEL_HARD
+};
+    static void set_lower_blanks(int b) {
+        Sudoku::lower_bound_blanks = b;
     }
+    static void set_upper_blanks(int b) {
+        Sudoku::upper_bound_blanks = b;
+    }
+    static void set_level(int l);
     Sudoku(bool no_blanks, bool ans_unique = false);
-    /* Generate a valid Sudoku board
-     * This can be done using a backtracking algorithm
-     * to fill in the board one cell at a time
-     */
     bool generateBoard(int row, int col);
     bool isValid(int row, int col, int num);
     void writeBoardToFile(std::string file_path);
+    void Random_leave_blank();
 };
 
 #endif

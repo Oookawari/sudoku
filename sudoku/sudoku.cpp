@@ -3,6 +3,12 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
+#include <random>
+
+
+int Sudoku::lower_bound_blanks = 20;
+int Sudoku::upper_bound_blanks = 25;
+
 Sudoku::Sudoku(bool no_blanks, bool ans_unique) {
     // Initialize board and masks
     for (int i = 0; i < ROW_NUM; i++) {
@@ -16,7 +22,31 @@ Sudoku::Sudoku(bool no_blanks, bool ans_unique) {
     //已经完成了生成，现在你需要挖空或者生成唯一解
     //TODO 
     if (no_blanks) {
-        
+        return;
+    }
+    else {
+        Random_leave_blank();
+    }
+
+}
+
+void Sudoku::set_level(int l) {
+    switch (l)
+    {
+    case LEVEL_EASY:
+        lower_bound_blanks = 20;
+        upper_bound_blanks = 25;
+        return;
+    case LEVEL_MEDIUM:
+        lower_bound_blanks = 30;
+        upper_bound_blanks = 35;
+        return;
+    case LEVEL_HARD:
+        lower_bound_blanks = 40;
+        upper_bound_blanks = 45;
+        return;
+    default:
+        break;
     }
 }
 
@@ -91,4 +121,23 @@ void Sudoku::writeBoardToFile(std::string file_path)
     }
 
     file.close();
+}
+
+void Sudoku::Random_leave_blank()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    int num = (rand() % (upper_bound_blanks - lower_bound_blanks + 1)) + lower_bound_blanks;
+
+    bool tempArray[ROW_NUM * COL_NUM];
+    std::fill(tempArray, tempArray + num, false);
+    std::fill(tempArray + num, tempArray + ROW_NUM * COL_NUM, true);
+    std::shuffle(tempArray, tempArray + ROW_NUM * COL_NUM, gen);
+
+    for (int i = 0; i < ROW_NUM; i++) {
+        for (int j = 0; j < COL_NUM; j++) {
+            masks[i][j] = tempArray[i * COL_NUM + j];
+        }
+    }
 }

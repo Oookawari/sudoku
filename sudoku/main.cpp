@@ -24,8 +24,7 @@ int number_of_games = 0;
 
 //生成游戏的难度
 bool opt_level = false;
-enum { LEVEL_NONE, LEVEL_EASY, LEVEL_MEDIUM, LEVEL_HARD };
-int game_level = LEVEL_NONE;
+int game_level = Sudoku::LEVEL_NONE;
 
 //生成挖空范围
 bool opt_range = false;
@@ -40,6 +39,8 @@ bool opt_unique = false;
 char opt_buffer[256];
 
 void args_check();
+
+
 
 int main(int argc, char* argv[])
 {
@@ -112,7 +113,28 @@ int main(int argc, char* argv[])
         //TODO
     }
     if (opt_number) {
-        //TODO
+        if (_access("./games", 00) == -1)
+            _mkdir("./games");
+        std::string file_names = "./games/games";
+        if (opt_level) {
+            Sudoku::set_level(game_level);
+        }
+        if (opt_range) {
+            Sudoku::set_lower_blanks(space_lower_bound);
+            Sudoku::set_upper_blanks(space_upper_bound);
+        }
+        if (opt_unique) {
+            for (int i = 1; i <= number_of_games; i++) {
+                Sudoku temp = Sudoku(false, true);
+                temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
+            }
+        }
+        else {
+            for (int i = 1; i <= number_of_games; i++) {
+                Sudoku temp = Sudoku(false);
+                temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
+            }
+        }
     }
     return 0;
 }
@@ -130,7 +152,7 @@ void args_check() {
 
     if (opt_level) {
         Assert(opt_number, "opt-m 需要opt-n");
-        Assert((game_level == LEVEL_EASY || game_level == LEVEL_MEDIUM || game_level == LEVEL_HARD), "游戏等级取值为 1,2,3 !");
+        Assert((game_level == Sudoku::LEVEL_EASY || game_level == Sudoku::LEVEL_MEDIUM || game_level == Sudoku::LEVEL_HARD), "游戏等级取值为 1,2,3 !");
     }
 
     if (opt_range) {
