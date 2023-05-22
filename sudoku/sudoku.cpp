@@ -20,14 +20,32 @@ Sudoku::Sudoku(bool no_blanks, bool ans_unique) {
 
     generateBoard(0, 0);
     //已经完成了生成，现在你需要挖空或者生成唯一解
-    //TODO 
     if (no_blanks) {
         return;
     }
     else {
         Random_leave_blank();
     }
+    if (ans_unique) {
+        int i = 0;
+        Random_leave_blank(); 
+        solveSudoku(0, 0);
+        while (solutions >= 2) {
+            for (int i = 0; i < ROW_NUM; i++) {
+                for (int j = 0; j < COL_NUM; j++) {
+                    board[i][j] = 0;
+                    masks[i][j] = true;
+                }
+            }
+            generateBoard(0, 0);
+            Random_leave_blank();
+            solutions = 0;
+            solveSudoku(0, 0);
+            i++;
+        }
+        std::cout << "重复了" << i << "次" << std::endl;
 
+    }
 }
 
 Sudoku::Sudoku(std::string file_name)
@@ -105,14 +123,14 @@ bool Sudoku::generateBoard(int row, int col) {
 bool Sudoku::isValid(int row, int col, int num) {
     // Check row
     for (int i = 0; i < COL_NUM; i++) {
-        if (board[row][i] == num) {
+        if (masks[row][i] == true && board[row][i] == num) {
             return false;
         }
     }
 
     // Check column
     for (int i = 0; i < ROW_NUM; i++) {
-        if (board[i][col] == num) {
+        if (masks[i][col] == true && board[i][col] == num) {
             return false;
         }
     }
@@ -122,7 +140,7 @@ bool Sudoku::isValid(int row, int col, int num) {
     int subgridColStart = (col / 3) * 3;
     for (int i = subgridRowStart; i < subgridRowStart + 3; i++) {
         for (int j = subgridColStart; j < subgridColStart + 3; j++) {
-            if (board[i][j] == num) {
+            if (masks[i][j] == true && board[i][j] == num) {
                 return false;
             }
         }
@@ -171,30 +189,28 @@ void Sudoku::Random_leave_blank()
     }
 }
 
-bool Sudoku::Solve(int row, int col)
-{
-    if (row == ROW_NUM) {
-        return true;
+bool Sudoku::solveSudoku(int row, int col) {
+    if (row == ROW_NUM - 1 && col == COL_NUM) {
+        solutions++;
+        if (solutions >= 2)
+            return true;
+        return false;
     }
-
     if (col == COL_NUM) {
-        return Solve(row + 1, 0);
+        row++;
+        col = 0;
     }
-
-    if (masks[row][col]) {
-        return Solve(row, col + 1);
-    }
-
+    if (masks[row][col])
+        return solveSudoku(row, col + 1);
     for (int num = 1; num <= 9; num++) {
         if (isValid(row, col, num)) {
             board[row][col] = num;
-            if (Solve(row, col + 1)) {
+            masks[row][col] = true;
+            if (solveSudoku(row, col + 1))
                 return true;
-            }
             board[row][col] = 0;
+            masks[row][col] = false;
         }
     }
-
     return false;
-
 }

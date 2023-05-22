@@ -13,6 +13,8 @@ private:
     static int upper_bound_blanks;
     int board[ROW_NUM][COL_NUM];
     bool masks[ROW_NUM][COL_NUM];
+    bool has_a_solution = false;
+    int solutions = 0;
 public:
     static enum
 {
@@ -31,8 +33,7 @@ public:
     bool isValid(int row, int col, int num);
     void writeBoardToFile(std::string file_path);
     void Random_leave_blank();
-    bool Solve(int row, int col);
-    bool genSolution() { return Solve(0, 0); }
+    bool solveSudoku(int row, int col);
 };
 
 #endif

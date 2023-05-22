@@ -30,7 +30,7 @@ int game_level = Sudoku::LEVEL_NONE;
 //Éú³ÉÍÚ¿Õ·¶Î§
 bool opt_range = false;
 const int MIN_SPACE = 20;
-const int MAX_SPACE = 55;
+const int MAX_SPACE = 80;
 unsigned int space_lower_bound = MIN_SPACE;
 unsigned int space_upper_bound = MAX_SPACE;
 
