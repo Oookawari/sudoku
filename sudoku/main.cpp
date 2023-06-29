@@ -1,170 +1,182 @@
-#include <iostream>
-#include <string.h>
-#include <time.h>
-#include <stdlib.h>
-#include <fstream>
+ï»¿
+
+// Copyright (C) 2023 NKU-LYC/LYH.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
 #include <direct.h>
 #include <io.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-#include "getopt.h"
+#include <fstream>
+#include <iostream>
+
 #include "Assert.h"
-#include "sudoku.h"
 #include "SudokuSolve.h"
-//ĞèÒªµÄÊı¶ÀÖÕÅÌÊıÁ¿
+#include "getopt.h"
+#include "sudoku.h"
+
+
+// éœ€è¦çš„æ•°ç‹¬ç»ˆç›˜æ•°é‡
 bool opt_gen_final = false;
 int final_num = 0;
 
-//ĞèÒªµÄÊı¶ÀÆåÅÌÇó½âÂ·¾¶
+// éœ€è¦çš„æ•°ç‹¬æ£‹ç›˜æ±‚è§£è·¯å¾„
 bool opt_solve = false;
 char solve_path[256] = "";
 
-//ĞèÒªµÄÓÎÏ·ÊıÁ¿
+// éœ€è¦çš„æ¸¸æˆæ•°é‡
 bool opt_number = false;
 int number_of_games = 0;
 
-
-//Éú³ÉÓÎÏ·µÄÄÑ¶È
+// ç”Ÿæˆæ¸¸æˆçš„éš¾åº¦
 bool opt_level = false;
 int game_level = Sudoku::LEVEL_NONE;
 
-//Éú³ÉÍÚ¿Õ·¶Î§
+// ç”ŸæˆæŒ–ç©ºèŒƒå›´
 bool opt_range = false;
 const int MIN_SPACE = 20;
 const int MAX_SPACE = 80;
 unsigned int space_lower_bound = MIN_SPACE;
 unsigned int space_upper_bound = MAX_SPACE;
 
-//Éú³ÉÎ¨Ò»½â
+// ç”Ÿæˆå”¯ä¸€è§£
 bool opt_unique = false;
 
 char opt_buffer[256];
 
 void args_check();
 
-
-
-int main(int argc, char* argv[])
-{
-    srand(time(nullptr));
-    int opt;
-    //²ÎÊı»ñÈ¡
-    char getopt_arg[] = "c:s:n:m:r:u";
-    while ((opt = getopt(argc, argv, getopt_arg)) != -1)
-    {
-        switch (opt)
-        {
-        case 'c':
-            Assert(!opt_gen_final, "duplicated opt:c");
-            opt_gen_final = true;
-            strcpy(opt_buffer, optarg);
-            final_num = atoi(opt_buffer);
-            break;
-        case 's':
-            Assert(!opt_solve, "duplicated opt:s");
-            opt_solve = true;
-            strcpy(solve_path, optarg);
-            break;
-        case 'n':
-            Assert(!opt_number, "duplicated opt:n");
-            opt_number = true;
-            strcpy(opt_buffer, optarg);
-            number_of_games = atoi(opt_buffer);
-            break;
-        case 'm':
-            Assert(!opt_level, "duplicated opt:m");
-            opt_level = true;
-            strcpy(opt_buffer, optarg);
-            game_level = atoi(opt_buffer);
-            break;
-        case 'r':
-            Assert(!opt_range, "duplicated opt:r");
-            opt_range = true;
-            strcpy(opt_buffer, optarg);
-            char* low_num;
-            char* up_num;
-            low_num = strtok(opt_buffer, "~");
-            space_lower_bound = atoi(low_num);
-            up_num = strtok(NULL, "~");
-            space_upper_bound = atoi(up_num);
-            break;
-        case 'u':
-            Assert(!opt_unique, "duplicated opt:u");
-            opt_unique = true;
-            break;
-        default:
-            char mess[256];
-            sprintf(mess, "Invalid Args: %c\n", opt);
-            Assert(0, mess);
-            break;
-        }
+int main(int argc, char* argv[]) {
+  srand(time(nullptr));
+  int opt;
+  // å‚æ•°è·å–
+  char getopt_arg[] = "c:s:n:m:r:u";
+  while ((opt = getopt(argc, argv, getopt_arg)) != -1) {
+    switch (opt) {
+      case 'c':
+        Assert(!opt_gen_final, "duplicated opt:c");
+        opt_gen_final = true;
+        snprintf(opt_buffer, sizeof(opt_buffer), "%s", optarg);
+        final_num = atoi(opt_buffer);
+        break;
+      case 's':
+        Assert(!opt_solve, "duplicated opt:s");
+        opt_solve = true;
+        snprintf(solve_path, sizeof(solve_path), "%s", optarg);
+        break;
+      case 'n':
+        Assert(!opt_number, "duplicated opt:n");
+        opt_number = true;
+        snprintf(opt_buffer, sizeof(opt_buffer), "%s", optarg);
+        number_of_games = atoi(opt_buffer);
+        break;
+      case 'm':
+        Assert(!opt_level, "duplicated opt:m");
+        opt_level = true;
+        snprintf(opt_buffer, sizeof(opt_buffer), "%s", optarg);
+        game_level = atoi(opt_buffer);
+        break;
+      case 'r':
+        Assert(!opt_range, "duplicated opt:r");
+        opt_range = true;
+        snprintf(opt_buffer, sizeof(opt_buffer), "%s", optarg);
+        char* low_num;
+        char* up_num;
+        low_num = strtok(opt_buffer, "~");
+        space_lower_bound = atoi(low_num);
+        up_num = strtok(NULL, "~");
+        space_upper_bound = atoi(up_num);
+        break;
+      case 'u':
+        Assert(!opt_unique, "duplicated opt:u");
+        opt_unique = true;
+        break;
+      default:
+        char mess[256];
+        snprintf(mess, sizeof(mess), "Invalid Args: %c\n", opt);
+        Assert(0, mess);
+        break;
     }
-    //²ÎÊı¼ì²é
-    args_check();
+  }
+  // å‚æ•°æ£€æŸ¥
+  args_check();
 
-    if (opt_gen_final) {
-        if (_access("./final_tables", 00) == -1)
-            _mkdir("./final_tables");
-        std::string file_names = "./final_tables/final_table_";
-        for (int i = 1; i <= final_num; i++) {
-            Sudoku temp = Sudoku(true);
-            temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
-        }
+  if (opt_gen_final) {
+    if (_access("./final_tables", 00) == -1) _mkdir("./final_tables");
+    std::string file_names = "./final_tables/final_table_";
+    for (int i = 1; i <= final_num; i++) {
+      Sudoku temp = Sudoku(true);
+      temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
     }
-    if (opt_solve) {
-
-        solveSudokuFile(solve_path, "sudoku.txt");
+  }
+  if (opt_solve) {
+    solveSudokuFile(solve_path, "sudoku.txt");
+  }
+  if (opt_number) {
+    if (_access("./games", 00) == -1) _mkdir("./games");
+    std::string file_names = "./games/games";
+    if (opt_level) {
+      Sudoku::set_level(game_level);
     }
-    if (opt_number) {
-        if (_access("./games", 00) == -1)
-            _mkdir("./games");
-        std::string file_names = "./games/games";
-        if (opt_level) {
-            Sudoku::set_level(game_level);
-        }
-        if (opt_range) {
-            Sudoku::set_lower_blanks(space_lower_bound);
-            Sudoku::set_upper_blanks(space_upper_bound);
-        }
-        if (opt_unique) {
-            for (int i = 1; i <= number_of_games; i++) {
-                Sudoku temp = Sudoku(false, true);
-                temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
-            }
-        }
-        else {
-            for (int i = 1; i <= number_of_games; i++) {
-                Sudoku temp = Sudoku(false);
-                temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
-            }
-        }
+    if (opt_range) {
+      Sudoku::set_lower_blanks(space_lower_bound);
+      Sudoku::set_upper_blanks(space_upper_bound);
     }
-    return 0;
+    if (opt_unique) {
+      for (int i = 1; i <= number_of_games; i++) {
+        Sudoku temp = Sudoku(false, true);
+        temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
+      }
+    } else {
+      for (int i = 1; i <= number_of_games; i++) {
+        Sudoku temp = Sudoku(false);
+        temp.writeBoardToFile(file_names + std::to_string(i) + ".txt");
+      }
+    }
+  }
+  return 0;
 }
 
 void args_check() {
-    if (opt_gen_final) {
-        Assert(final_num > 0, "ÓÎÏ·ÖÕ¾ÖÊıÁ¿ĞèÒª > 0 !");
-        Assert(final_num <= 1000000, "ÓÎÏ·ÖÕ¾ÖÊıÁ¿ĞèÒª < 1000000 !");
-    }
-    if (opt_number) {
-        Assert(number_of_games > 0, "ÓÎÏ·ÊıÁ¿ĞèÒª > 0");
-        Assert(number_of_games <= 10000, "ÓÎÏ·ÊıÁ¿ĞèÒª < 10000");
-    }
-        
+  if (opt_gen_final) {
+    Assert(final_num > 0, "æ¸¸æˆç»ˆå±€æ•°é‡éœ€è¦ > 0 !");
+    Assert(final_num <= 1000000, "æ¸¸æˆç»ˆå±€æ•°é‡éœ€è¦ < 1000000 !");
+  }
+  if (opt_number) {
+    Assert(number_of_games > 0, "æ¸¸æˆæ•°é‡éœ€è¦ > 0");
+    Assert(number_of_games <= 10000, "æ¸¸æˆæ•°é‡éœ€è¦ < 10000");
+  }
 
-    if (opt_level) {
-        Assert(opt_number, "opt-m ĞèÒªopt-n");
-        Assert((game_level == Sudoku::LEVEL_EASY || game_level == Sudoku::LEVEL_MEDIUM || game_level == Sudoku::LEVEL_HARD), "ÓÎÏ·µÈ¼¶È¡ÖµÎª 1,2,3 !");
-    }
+  if (opt_level) {
+    Assert(opt_number, "opt-m éœ€è¦opt-n");
+    Assert((game_level == Sudoku::LEVEL_EASY ||
+            game_level == Sudoku::LEVEL_MEDIUM ||
+            game_level == Sudoku::LEVEL_HARD),
+           "æ¸¸æˆç­‰çº§å–å€¼ä¸º 1,2,3 !");
+  }
 
-    if (opt_range) {
-        Assert(opt_number, "opt-r ĞèÒªopt-n");
-        Assert(space_lower_bound <= space_upper_bound, "ÍÚ¿ÕÊıÁ¿ÉÏÏÂ½ç´íÎó");
-        Assert(MIN_SPACE <= space_lower_bound, "ÍÚ¿ÕÊıÁ¿ÏÂ½çĞ¡ÓÚ×îĞ¡Öµ20");
-        Assert(MAX_SPACE >= space_upper_bound, "ÍÚ¿ÕÊıÁ¿ÏÂ½ç´óÓÚ×î´óÖµ55");
-    }
+  if (opt_range) {
+    Assert(opt_number, "opt-r éœ€è¦opt-n");
+    Assert(space_lower_bound <= space_upper_bound, "æŒ–ç©ºæ•°é‡ä¸Šä¸‹ç•Œé”™è¯¯");
+    Assert(MIN_SPACE <= space_lower_bound, "æŒ–ç©ºæ•°é‡ä¸‹ç•Œå°äºæœ€å°å€¼20");
+    Assert(MAX_SPACE >= space_upper_bound, "æŒ–ç©ºæ•°é‡ä¸‹ç•Œå¤§äºæœ€å¤§å€¼55");
+  }
 
-    if (opt_unique) {
-        Assert(opt_number, "opt-u ĞèÒªopt-n");
-    }
+  if (opt_unique) {
+    Assert(opt_number, "opt-u éœ€è¦opt-n");
+  }
 }
