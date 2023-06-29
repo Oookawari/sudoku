@@ -89,7 +89,7 @@ void SudokuSolve::readFromFile(std::ifstream& file) {
     }
     for (int col = 0; col < COL_NUM; col++) {
       char c = line[col * 2];
-      if (c == '_') {
+      if (c == '$') {
         board[row][col] = 0;
         masks[row][col] = false;
       } else {

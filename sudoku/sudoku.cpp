@@ -75,7 +75,7 @@ Sudoku::Sudoku(std::string file_name) {
   while (std::getline(file, line)) {
     for (int col = 0; col < COL_NUM; col++) {
       char c = line[col];
-      if (c == '_') {
+      if (c == '$') {
         board[row][col] = 0;
         masks[row][col] = false;
       } else {
@@ -172,7 +172,7 @@ void Sudoku::writeBoardToFile(std::string file_path) {
       if (masks[i][j])
         file << board[i][j] << ' ';
       else
-        file << '_' << ' ';
+        file << '$' << ' ';
     }
     file << '\n';
   }
